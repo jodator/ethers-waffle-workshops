@@ -36,8 +36,8 @@ describe('Ether Splitter', () => {
     await splitter.split({value: 2})
     const firstAfter = await first.getBalance()
     const secondAfter = await second.getBalance()
-    expect( firstAfter.sub(firstBalance) ).to.equal(1)
-    expect( secondAfter.sub(secondBalance) ).to.equal(1)
+    expect(firstAfter.sub(firstBalance)).to.equal(1);
+    expect(secondAfter.sub(secondBalance)).to.equal(1);
   })
 
   it('splits evenly with odd number', async () => {
@@ -93,7 +93,7 @@ describe('Ether Splitter', () => {
     it('Reverts for second invalid address', async () => {
       await expect( splitter.setAddresses(third.address, addressZero) ).to.be.revertedWith('Wrong address')
     } );
-    
+
     it('Not callable by not owner', async () => {
       await expect( splitterWithThird.setAddresses(first.address, third.address) ).to.be.revertedWith('Ownable: caller is not the owner')
     } );
