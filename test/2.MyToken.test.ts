@@ -31,6 +31,11 @@ describe.only('MyToken', () => {
   });
 
   it('Can not transfer above the amount', async () => {
+    await token.transfer(walletTo.address, 7);
+    await expect(token.transfer(walletTo.address, 1000)).to.be.reverted;
+  });
+
+  it('Can not transfer less than owned', async () => {
     await expect(token.transfer(walletTo.address, 1007)).to.be.reverted;
   });
 
@@ -40,8 +45,6 @@ describe.only('MyToken', () => {
 
   it('Can not transfer from empty account', async () => {
     const tokenFromOtherWallet = token.connect(walletTo);
-    await expect(tokenFromOtherWallet.transfer(wallet.address, 1))
-      .to.be.reverted;
+    await expect(tokenFromOtherWallet.transfer(wallet.address, 1)).to.be.reverted;
   });
-
 });
