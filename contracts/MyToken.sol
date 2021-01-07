@@ -40,7 +40,9 @@ contract MyToken is IERC20 {
     }
 
     function approve(address spender, uint256 amount) external override returns (bool) {
-        revert('Not Implemented');
+        allowances[msg.sender][spender] = amount;
+
+        return true;
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {

@@ -52,4 +52,10 @@ describe.only('MyToken', () => {
     expect(await token.allowance(walletFrom.address, splitter.address)).to.equal(0);
   });
 
+  it('Approves account allowance', async () => {
+    await token.transfer(walletFrom.address, 10);
+    const tokenWithWalletFrom = token.connect(walletFrom)
+    await tokenWithWalletFrom.approve(splitter.address, 8);
+    expect( await token.allowance(walletFrom.address, splitter.address) ).to.equal(8);
+  });
 });
