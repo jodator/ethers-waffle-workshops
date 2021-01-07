@@ -2,17 +2,20 @@ import {expect, use} from 'chai';
 import {Contract} from 'ethers';
 import {deployContract, MockProvider, solidity} from 'ethereum-waffle';
 import MyToken from '../build/MyToken.json';
+import EtherSplitter from '../build/EtherSplitter.json';
 
 use(solidity);
 
 const addressZero = '0x0000000000000000000000000000000000000000'
 
 describe.only('MyToken', () => {
-  const [wallet, walletTo, walletFrom, splitter] = new MockProvider().getWallets();
+  const [wallet, walletTo, walletFrom, splitter, first, second] = new MockProvider().getWallets();
   let token: Contract;
+  let splitterContract: Contract;
 
   beforeEach(async () => {
     token = await deployContract(wallet, MyToken, [1000]);
+    splitterContract = await deployContract(wallet, EtherSplitter, [first.address, second.address, token.address]);
   });
 
   it('Assigns initial balance', async () => {
@@ -57,5 +60,44 @@ describe.only('MyToken', () => {
     const tokenWithWalletFrom = token.connect(walletFrom)
     await tokenWithWalletFrom.approve(splitter.address, 8);
     expect( await token.allowance(walletFrom.address, splitter.address) ).to.equal(8);
+  });
+
+  it('Allows to spend allowed amount', async () => {
+    await token.transfer(walletFrom.address, 10);
+    const tokenWithWalletFrom = token.connect(walletFrom);
+    await tokenWithWalletFrom.approve(splitter.address, 8);
+    const tokenWithSplitter = token.connect(splitter);
+
+    await tokenWithSplitter.transferFrom(walletFrom.address, walletTo.address, 8);
+
+    expect(await token.balanceOf(walletTo.address)).to.equal(8);
+  });
+
+  it('Splits token amount', async () => {
+    await token.transfer(walletFrom.address, 10);
+    const tokenWithWalletFrom = token.connect(walletFrom);
+    await tokenWithWalletFrom.approve(splitterContract.address, 8);
+
+    expect(await token.balanceOf(first.address)).to.equal(0);
+    expect(await token.balanceOf(second.address)).to.equal(0);
+
+    await splitterContract.connect(walletFrom).splitToken()
+
+    expect(await token.balanceOf(first.address)).to.equal(4);
+    expect(await token.balanceOf(second.address)).to.equal(4);
+  });
+
+  it('Throws if not approved', async () => {
+    await token.transfer(walletFrom.address, 10);
+    const tokenWithWalletFrom = token.connect(walletFrom);
+    // await tokenWithWalletFrom.approve(splitterContract.address, 8);
+
+    expect(await token.balanceOf(first.address)).to.equal(0);
+    expect(await token.balanceOf(second.address)).to.equal(0);
+
+    await expect(splitterContract.connect(walletFrom).splitToken()).to.be.revertedWith('Cannot split zero');
+
+    expect(await token.balanceOf(first.address)).to.equal(0);
+    expect(await token.balanceOf(second.address)).to.equal(0);
   });
 });

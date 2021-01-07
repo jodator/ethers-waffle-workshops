@@ -26,11 +26,7 @@ contract MyToken is IERC20 {
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
-        require(recipient != address(0), 'Cannot transfer to address zero');
-        balances[msg.sender] = balances[msg.sender].sub(amount);
-        balances[recipient] = balances[recipient].add(amount);
-
-        emit Transfer(msg.sender, recipient, amount);
+        _transfer(msg.sender, recipient, amount);
 
         return true;
     }
@@ -46,7 +42,16 @@ contract MyToken is IERC20 {
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {
-        revert('Not Implemented');
+        _transfer(sender, recipient, amount);
+
+        return true;
     }
 
+    function _transfer(address sender, address recipient, uint amount) private {
+        require(recipient != address(0), 'Cannot transfer to address zero');
+        balances[sender] = balances[sender].sub(amount);
+        balances[recipient] = balances[recipient].add(amount);
+
+        emit Transfer(msg.sender, recipient, amount);
+    }
 }
