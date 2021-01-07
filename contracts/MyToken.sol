@@ -25,6 +25,7 @@ contract MyToken is IERC20 {
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
+        require(recipient != address(0), 'Cannot transfer to address zero');
         balances[msg.sender] = balances[msg.sender].sub(amount);
         balances[recipient] = balances[recipient].add(amount);
 

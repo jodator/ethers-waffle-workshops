@@ -5,6 +5,8 @@ import MyToken from '../build/MyToken.json';
 
 use(solidity);
 
+const addressZero = '0x0000000000000000000000000000000000000000'
+
 describe.only('MyToken', () => {
   const [wallet, walletTo] = new MockProvider().getWallets();
   let token: Contract;
@@ -30,6 +32,10 @@ describe.only('MyToken', () => {
 
   it('Can not transfer above the amount', async () => {
     await expect(token.transfer(walletTo.address, 1007)).to.be.reverted;
+  });
+
+  it('Can not transfer to address zero', async () => {
+    await expect(token.transfer(addressZero, 7)).to.be.reverted;
   });
 
   it('Can not transfer from empty account', async () => {
