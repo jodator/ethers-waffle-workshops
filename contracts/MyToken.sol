@@ -14,6 +14,8 @@ contract MyToken is IERC20 {
         balances[msg.sender] = _initialBalance;
     }
 
+    event Transfer(address sender, address recipient, uint amount);
+
     function totalSupply() external view override returns (uint256) {
         revert('Not Implemented');
     }
@@ -23,7 +25,12 @@ contract MyToken is IERC20 {
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
-        revert('Not Implemented');
+        balances[msg.sender] = balances[msg.sender].sub(amount);
+        balances[recipient] = balances[recipient].add(amount);
+
+        emit Transfer(msg.sender, recipient, amount);
+
+        return true;
     }
 
     function allowance(address owner, address spender) external override view returns (uint256) {
