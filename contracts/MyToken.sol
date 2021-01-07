@@ -2,10 +2,12 @@
 pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract MyToken is IERC20 {
+    using SafeMath for uint;
     mapping(address => uint) balances;
-    uint256 total;
+    uint total;
 
     constructor(uint _initialBalance) public {
         total = _initialBalance;
@@ -23,9 +25,6 @@ contract MyToken is IERC20 {
     function transfer(address recipient, uint256 amount) external override returns (bool) {
         revert('Not Implemented');
     }
-
-
-
 
     function allowance(address owner, address spender) external override view returns (uint256) {
         revert('Not Implemented');
