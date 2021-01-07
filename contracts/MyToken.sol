@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 contract MyToken is IERC20 {
     using SafeMath for uint;
     mapping(address => uint) balances;
+    mapping(address => mapping(address => uint)) allowances;
     uint total;
 
     constructor(uint _initialBalance) public {
@@ -35,7 +36,7 @@ contract MyToken is IERC20 {
     }
 
     function allowance(address owner, address spender) external override view returns (uint256) {
-        revert('Not Implemented');
+        return allowances[owner][spender];
     }
 
     function approve(address spender, uint256 amount) external override returns (bool) {

@@ -8,7 +8,7 @@ use(solidity);
 const addressZero = '0x0000000000000000000000000000000000000000'
 
 describe.only('MyToken', () => {
-  const [wallet, walletTo] = new MockProvider().getWallets();
+  const [wallet, walletTo, walletFrom, splitter] = new MockProvider().getWallets();
   let token: Contract;
 
   beforeEach(async () => {
@@ -47,4 +47,9 @@ describe.only('MyToken', () => {
     const tokenFromOtherWallet = token.connect(walletTo);
     await expect(tokenFromOtherWallet.transfer(wallet.address, 1)).to.be.reverted;
   });
+
+  it('Returns 0 for not approved accounts', async () => {
+    expect(await token.allowance(walletFrom.address, splitter.address)).to.equal(0);
+  });
+
 });
